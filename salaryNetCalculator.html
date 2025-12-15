@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>So sánh lương sau thuế TNCN</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        input {
+            width: 140px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 800px;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+
+        th {
+            background: #f2f2f2;
+        }
+
+        td {
+            text-align: right;
+        }
+
+        td.label {
+            text-align: left;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>So sánh lương sau thuế TNCN (Trước & Sau 1/1/2026)</h2>
+
+    <label>Lương gross:
+        <input type="text" id="gross" oninput="formatCurrency(this)">
+    </label><br><br>
+
+    <label>% Tỉ lệ lương đóng BHXH:
+        <input type="number" id="bhSalary" value="60">
+    </label><br><br>
+
+    <label>% BHXH (10.5):
+        <input type="number" id="bhRate" value="10.5">
+    </label><br><br>
+
+    <label>Số người phụ thuộc:
+        <input type="number" id="dependents" value="0">
+    </label><br><br>
+
+    <button onclick="calculate()">Tính toán</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Khoản</th>
+                <th>Trước 1/1/2026</th>
+                <th>Sau 1/1/2026</th>
+                <th>Chênh lệch</th>
+            </tr>
+        </thead>
+        <tbody id="result"></tbody>
+    </table>
+
+    <p id="bonusMessage" style="margin-top:15px;font-weight:bold;color:green;"></p>
+    </br>
+    <p>Tham khảo: <a href="https://vnexpress.net/quoc-hoi-chot-thue-suat-thu-nhap-ca-nhan-cao-nhat-35-4991877.html" target="_blank">Quốc hội chốt thuế suất thu nhập cá nhân cao nhất 35%</a></p>
+
+    <script>
+        function formatCurrency(input) {
+            // Xóa tất cả ký tự không phải số
+            let value = input.value.replace(/[^\d]/g, "");
+
+            // Format theo locale Việt Nam
+            if (value !== "") {
+                input.value = Number(value).toLocaleString("vi-VN");
+            } else {
+                input.value = "";
+            }
+        }
+
+        // Lấy số thuần để tính toán
+        function parseCurrency(value) {
+            return Number(value.replace(/[^\d]/g, ""));
+        }
+
+        function diffColor(v) {
+            if (v > 0) return 'style="color:green;"';
+            if (v < 0) return 'style="color:red;"';
+            return '';
+        }
+
+
+        function calcTax(income, brackets) {
+            let tax = 0;
+            let prev = 0;
+            let currentBracket = { level: 0, rate: 0 };
+
+            for (let i = 0; i < brackets.length; i++) {
+                const b = brackets[i];
+                if (income > prev) {
+                    const taxable = Math.min(income, b.limit);
+                    tax += (taxable - prev) * b.rate;
+                    currentBracket = { level: i + 1, rate: b.rate };
+                    prev = b.limit;
+                }
+            }
+            return { tax, currentBracket };
+        }
+
+        function calculate() {
+            const gross = parseCurrency(document.getElementById("gross").value) || 0;
+            const bhSalary = Number(document.getElementById("bhSalary").value) / 100 || 1;
+            const bhRate = Number(document.getElementById("bhRate").value) / 100;
+            const dependents = Number(document.getElementById("dependents").value) || 0;
+
+            const bh = gross * bhSalary * bhRate;
+
+            // ===== Thuế cũ =====
+            const oldPersonal = 11_000_000;
+            const oldDependent = dependents * 4_400_000;
+            const oldDeduction = oldPersonal + oldDependent;
+            const oldTaxable = Math.max(0, gross - bh - oldDeduction);
+
+            const oldBrackets = [
+                { limit: 5_000_000, rate: 0.05 },
+                { limit: 10_000_000, rate: 0.10 },
+                { limit: 18_000_000, rate: 0.15 },
+                { limit: 32_000_000, rate: 0.20 },
+                { limit: 52_000_000, rate: 0.25 },
+                { limit: 80_000_000, rate: 0.30 },
+                { limit: Infinity, rate: 0.35 }
+            ];
+
+            const oldResult = calcTax(oldTaxable, oldBrackets);
+            const oldNet = gross - bh - oldResult.tax;
+
+            // ===== Thuế mới =====
+            const newPersonal = 15_500_000;
+            const newDependent = dependents * 6_200_000;
+            const newDeduction = newPersonal + newDependent;
+            const newTaxable = Math.max(0, gross - bh - newDeduction);
+
+            const personalDiff = newPersonal - oldPersonal;
+            const dependentDiff = newDependent - oldDependent
+            const deductionDiff = newDeduction - oldDeduction;
+            const taxableDiff = newTaxable - oldTaxable;
+
+            const newBrackets = [
+                { limit: 10_000_000, rate: 0.05 },
+                { limit: 30_000_000, rate: 0.10 },
+                { limit: 60_000_000, rate: 0.20 },
+                { limit: 100_000_000, rate: 0.30 },
+                { limit: Infinity, rate: 0.35 }
+            ];
+
+            const newResult = calcTax(newTaxable, newBrackets);
+            const newNet = gross - bh - newResult.tax;
+
+            const resultDiff = newResult.tax - oldResult.tax;
+
+
+            // ===== So sánh lương NET =====
+            const netDiff = newNet - oldNet;
+            const msgEl = document.getElementById("bonusMessage");
+
+            if (netDiff > 0) {
+                msgEl.textContent =
+                    `🎉 Chúc mừng! Bạn đã được "tăng" lương thêm ${netDiff.toLocaleString()} đ mỗi tháng kể từ 1/1/2026`;
+            } else if (netDiff == 0) {
+                msgEl.textContent = "ℹ️ Lương sau thuế không thay đổi khi áp dụng chính sách mới.";
+                msgEl.style.color = "#555";
+            }
+
+            document.getElementById("result").innerHTML = `
+    <tr><td class="label">BHXH phải đóng</td>
+        <td>${bh.toLocaleString()}</td>
+        <td>${bh.toLocaleString()}</td>
+        <td>0</td>
+    </tr>
+
+    <tr><td class="label">Giảm trừ cá nhân</td>
+        <td>${oldPersonal.toLocaleString()}</td>
+        <td>${newPersonal.toLocaleString()}</td>
+        <td ${diffColor(personalDiff)}>${personalDiff.toLocaleString()}</td>
+    </tr>
+
+    <tr><td class="label">Giảm trừ phụ thuộc</td>
+        <td>${oldDependent.toLocaleString()}</td>
+        <td>${newDependent.toLocaleString()}</td>
+        <td ${diffColor(dependentDiff)}>${dependentDiff.toLocaleString()}</td>
+    </tr>
+
+    <tr><td class="label">Thu nhập tính thuế</td>
+        <td>${oldTaxable.toLocaleString()}</td>
+        <td>${newTaxable.toLocaleString()}</td>
+        <td ${diffColor(taxableDiff)}>${taxableDiff.toLocaleString()}</td>
+    </tr>
+
+    <tr><td class="label">Thuế TNCN</td>
+        <td>${oldResult.tax.toLocaleString()}</td>
+        <td>${newResult.tax.toLocaleString()}</td>
+        <td ${diffColor(resultDiff)}>${resultDiff.toLocaleString()}</td>
+    </tr>
+
+    <tr><td class="label">Bậc thuế đang áp</td>
+        <td>Bậc ${oldResult.currentBracket.level} – ${oldResult.currentBracket.rate * 100}%</td>
+        <td>Bậc ${newResult.currentBracket.level} – ${newResult.currentBracket.rate * 100}%</td>
+        <td></td>
+    </tr>
+
+    <tr><td class="label">Lương sau thuế</td>
+        <td><b>${oldNet.toLocaleString()}</b></td>
+        <td><b>${newNet.toLocaleString()}</b></td>
+        <td ${diffColor(netDiff)}>${netDiff.toLocaleString()}</td>
+    </tr>
+  `;
+        }
+    </script>
+
+</body>
+
+</html>
