@@ -1,12 +1,357 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <head>
-    <meta charset="utf-8">
-    <title>Redirecting...</title>
-    <meta http-equiv="refresh" content="0; URL=https://txhuy.github.io/salary-net-calculator-2026/salaryNetCalculator.html">
-    <link rel="canonical" href="https://txhuy.github.io/salary-net-calculator-2026/salaryNetCalculator.html">
+    <meta charset="UTF-8">
+    <title>So sánh lương sau thuế TNCN</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        input {
+            width: 150px;
+        }
+
+        input.short {
+            width: 40px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 800px;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+
+        th {
+            background: #f2f2f2;
+        }
+
+        td {
+            text-align: right;
+        }
+
+        td.label {
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .btn-calc {
+            background: #2563eb;
+            /* xanh hiện đại */
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.1s ease;
+        }
+
+        /* Desktop hover */
+        .btn-calc:hover {
+            background: #1d4ed8;
+        }
+
+        /* Active (mobile tap) */
+        .btn-calc:active {
+            transform: scale(0.98);
+        }
+
+        .btn-wrapper {
+            margin: 16px 0;
+        }
+
+        @media (max-width: 768px) {
+            input {
+                font-size: 16px;
+                padding: 4px;
+            }
+
+            table,
+            thead,
+            tbody,
+            th,
+            td,
+            tr {
+                display: block;
+            }
+
+            thead {
+                display: none;
+            }
+
+            tr {
+                border: 1px solid #ddd;
+                margin-bottom: 12px;
+                border-radius: 6px;
+                padding: 8px;
+                background: #fafafa;
+            }
+
+            td {
+                text-align: left;
+                border: none;
+                padding: 6px 0;
+                display: flex;
+                justify-content: space-between;
+            }
+
+            td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                color: #555;
+            }
+
+            td.label {
+                font-weight: bold;
+                font-size: 16px;
+                margin-bottom: 6px;
+                text-align: left;
+                display: block;
+                justify-content: flex-start;
+            }
+
+            td.label::before {
+                content: "";
+            }
+
+            .btn-calc {
+                width: 100%;
+                padding: 8px;
+                font-size: 16px;
+                border-radius: 8px;
+            }
+        }
+    </style>
 </head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E7NP8FETMZ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-E7NP8FETMZ');
+</script>
+
 <body>
-    <p>If you are not redirected automatically, follow this <a href="https://txhuy.github.io/salary-net-calculator-2026/salaryNetCalculator.html">salaryNetCalculator.html</a>.</p>
+    <h2>So sánh lương sau thuế TNCN (Trước & Sau 1/1/2026)</h2>
+
+    <label>Lương gross:
+        <input id="gross" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocorrect="off"
+            spellcheck="false" oninput="formatCurrency(this)">
+    </label><br><br>
+
+    <label>% Tỉ lệ lương đóng BHXH:
+        <input class="short" type="number" id="bhSalary" value="100">
+    </label><br><br>
+
+    <label>% Mức đóng BHXH:
+        <input class="short" type="number" id="bhRate" value="10.5">
+    </label><br><br>
+
+    <label>Số người phụ thuộc:
+        <input class="short" type="number" id="dependents" value="0">
+    </label><br>
+
+    <div class="btn-wrapper">
+        <button class="btn-calc" onclick="calculate()">Tính toán</button>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Khoản</th>
+                    <th>Trước 1/1/2026</th>
+                    <th>Sau 1/1/2026</th>
+                    <th>Chênh lệch</th>
+                </tr>
+            </thead>
+            <tbody id="result"></tbody>
+        </table>
+    </div>
+    <p id="bonusMessage" style="margin-top:15px;font-weight:bold;color:green;"></p>
+    </br>
+    <p>Tham khảo:</p>
+    <p>VnExpress: <a href="https://vnexpress.net/quoc-hoi-chot-thue-suat-thu-nhap-ca-nhan-cao-nhat-35-4991877.html"
+            target="_blank">Quốc hội chốt thuế suất thu nhập cá nhân cao nhất 35%</a></p>
+    <p>Thư viện Pháp luật: <a
+            href="https://thuvienphapluat.vn/phap-luat/ho-tro-phap-luat/ap-dung-giam-tru-gia-canh-tu-01012026-hay-0172026-muc-giam-tru-gia-canh-2026-nhu-the-nao-245956.html"
+            target="_blank">Áp dụng giảm trừ gia cảnh từ 01/01/2026 hay 01/7/2026? Mức giảm trừ gia cảnh 2026 như thế
+            nào?</a></p>
+
+    <script>
+        function formatCurrency(input) {
+            // Xóa tất cả ký tự không phải số
+            let value = input.value.replace(/[^\d]/g, "");
+
+            // Format theo locale Việt Nam
+            if (value !== "") {
+                input.value = Number(value).toLocaleString("vi-VN");
+            } else {
+                input.value = "";
+            }
+        }
+
+        // Lấy số thuần để tính toán
+        function parseCurrency(value) {
+            return Number(value.replace(/[^\d]/g, ""));
+        }
+
+        function diffColor(v) {
+            if (v > 0) return 'style="color:green;"';
+            if (v < 0) return 'style="color:red;"';
+            return '';
+        }
+
+
+        function calcTax(income, brackets) {
+            let tax = 0;
+            let prev = 0;
+            let currentBracket = { level: 0, rate: 0 };
+
+            for (let i = 0; i < brackets.length; i++) {
+                const b = brackets[i];
+                if (income > prev) {
+                    const taxable = Math.min(income, b.limit);
+                    tax += (taxable - prev) * b.rate;
+                    currentBracket = { level: i + 1, rate: b.rate };
+                    prev = b.limit;
+                }
+            }
+            return { tax, currentBracket };
+        }
+
+        function calculate() {
+            const gross = parseCurrency(document.getElementById("gross").value) || 0;
+            const bhSalary = Number(document.getElementById("bhSalary").value) / 100 || 1;
+            const bhRate = Number(document.getElementById("bhRate").value) / 100;
+            const dependents = Number(document.getElementById("dependents").value) || 0;
+
+            const bh = gross * bhSalary * bhRate;
+
+            // ===== Thuế cũ =====
+            const oldPersonal = 11_000_000;
+            const oldDependent = dependents * 4_400_000;
+            const oldDeduction = oldPersonal + oldDependent;
+            const oldTaxable = Math.max(0, gross - bh - oldDeduction);
+
+            const oldBrackets = [
+                { limit: 5_000_000, rate: 0.05 },
+                { limit: 10_000_000, rate: 0.10 },
+                { limit: 18_000_000, rate: 0.15 },
+                { limit: 32_000_000, rate: 0.20 },
+                { limit: 52_000_000, rate: 0.25 },
+                { limit: 80_000_000, rate: 0.30 },
+                { limit: Infinity, rate: 0.35 }
+            ];
+
+            const oldResult = calcTax(oldTaxable, oldBrackets);
+            const oldNet = gross - bh - oldResult.tax;
+
+            // ===== Thuế mới =====
+            const newPersonal = 15_500_000;
+            const newDependent = dependents * 6_200_000;
+            const newDeduction = newPersonal + newDependent;
+            const newTaxable = Math.max(0, gross - bh - newDeduction);
+
+            const personalDiff = newPersonal - oldPersonal;
+            const dependentDiff = newDependent - oldDependent
+            const deductionDiff = newDeduction - oldDeduction;
+            const taxableDiff = newTaxable - oldTaxable;
+
+            const newBrackets = [
+                { limit: 10_000_000, rate: 0.05 },
+                { limit: 30_000_000, rate: 0.10 },
+                { limit: 60_000_000, rate: 0.20 },
+                { limit: 100_000_000, rate: 0.30 },
+                { limit: Infinity, rate: 0.35 }
+            ];
+
+            const newResult = calcTax(newTaxable, newBrackets);
+            const newNet = gross - bh - newResult.tax;
+            const taxRateDiff = newResult.currentBracket.rate - oldResult.currentBracket.rate;
+
+            const resultDiff = newResult.tax - oldResult.tax;
+
+            // ===== So sánh lương NET =====
+            const netDiff = newNet - oldNet;
+            const msgEl = document.getElementById("bonusMessage");
+
+            if (netDiff > 0) {
+                msgEl.textContent =
+                    `🎉 Chúc mừng! Bạn được "tăng" lương thêm ${netDiff.toLocaleString()} đ mỗi tháng kể từ 1/1/2026.`;
+            } else if (netDiff == 0) {
+                msgEl.textContent = "ℹ️ Lương sau thuế không thay đổi khi áp dụng chính sách mới.";
+                msgEl.style.color = "#555";
+            }
+
+            document.getElementById("result").innerHTML = `
+    <tr><td class="label">BHXH phải đóng</td>
+        <td data-label="Trước 1/1/2026">${bh.toLocaleString()}</td>
+        <td data-label="Sau 1/1/2026">${bh.toLocaleString()}</td>
+        <td></td>
+    </tr>
+
+    <tr><td class="label">Giảm trừ cá nhân</td>
+        <td data-label="Trước 1/1/2026">${oldPersonal.toLocaleString()}</td>
+        <td data-label="Sau 1/1/2026">${newPersonal.toLocaleString()}</td>
+        <td data-label="Chênh lệch" ${diffColor(personalDiff)}>${personalDiff.toLocaleString()}</td>
+    </tr>
+
+    <tr><td class="label">Giảm trừ phụ thuộc</td>
+        <td data-label="Trước 1/1/2026">${oldDependent.toLocaleString()}</td>
+        <td data-label="Sau 1/1/2026">${newDependent.toLocaleString()}</td>
+        <td data-label="Chênh lệch" ${diffColor(dependentDiff)}>${dependentDiff.toLocaleString()}</td>
+    </tr>
+
+    <tr><td class="label">Thu nhập tính thuế</td>
+        <td data-label="Trước 1/1/2026">${oldTaxable.toLocaleString()}</td>
+        <td data-label="Sau 1/1/2026">${newTaxable.toLocaleString()}</td>
+        <td data-label="Chênh lệch" ${diffColor(taxableDiff)}>${taxableDiff.toLocaleString()}</td>
+    </tr>
+
+    <tr><td class="label">Thuế TNCN</td>
+        <td data-label="Trước 1/1/2026">${oldResult.tax.toLocaleString()}</td>
+        <td data-label="Sau 1/1/2026">${newResult.tax.toLocaleString()}</td>
+        <td data-label="Chênh lệch" ${diffColor(resultDiff)}>${resultDiff.toLocaleString()}</td>
+    </tr>
+
+    <tr><td class="label">Bậc thuế đang áp</td>
+        <td data-label="Trước 1/1/2026">Bậc ${oldResult.currentBracket.level} – ${oldResult.currentBracket.rate * 100}%</td>
+        <td data-label="Sau 1/1/2026">Bậc ${newResult.currentBracket.level} – ${newResult.currentBracket.rate * 100}%</td>
+        <td data-label="Chênh lệch" ${diffColor(resultDiff)}>${(taxRateDiff * 100).toLocaleString()}%</td>
+    </tr>
+
+    <tr><td class="label">Lương sau thuế</td>
+        <td data-label="Trước 1/1/2026"><b>${oldNet.toLocaleString()}</b></td>
+        <td data-label="Sau 1/1/2026"><b>${newNet.toLocaleString()}</b></td>
+        <td data-label="Chênh lệch" ${diffColor(netDiff)}>${netDiff.toLocaleString()}</td>
+    </tr>
+  `;
+
+            //   Google Analytics Event
+            if (typeof gtag === "function") {
+                gtag('event', 'calculate', {
+                    event_category: 'interaction',
+                    event_label: 'salary_calculation'
+                });
+            }
+        }
+    </script>
+
 </body>
+
 </html>
