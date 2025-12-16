@@ -12,7 +12,11 @@
         }
 
         input {
-            width: 140px;
+            width: 150px;
+        }
+
+        input.short {
+            width: 40px;
         }
 
         table {
@@ -69,6 +73,10 @@
         }
 
         @media (max-width: 768px) {
+            input {
+                font-size: 16px;
+                padding: 4px;
+            }
 
             table,
             thead,
@@ -132,19 +140,20 @@
     <h2>So sánh lương sau thuế TNCN (Trước & Sau 1/1/2026)</h2>
 
     <label>Lương gross:
-        <input type="text" id="gross" oninput="formatCurrency(this)">
+        <input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocorrect="off" spellcheck="false"
+            oninput="formatCurrency(this)">
     </label><br><br>
 
     <label>% Tỉ lệ lương đóng BHXH:
-        <input type="number" id="bhSalary" value="100">
+        <input class="short" type="number" id="bhSalary" value="100">
     </label><br><br>
 
     <label>% Mức đóng BHXH:
-        <input type="number" id="bhRate" value="10.5">
+        <input class="short" type="number" id="bhRate" value="10.5">
     </label><br><br>
 
     <label>Số người phụ thuộc:
-        <input type="number" id="dependents" value="0">
+        <input class="short" type="number" id="dependents" value="0">
     </label><br>
 
     <div class="btn-wrapper">
