@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <head>
     <meta charset="UTF-8">
@@ -39,11 +40,95 @@
             text-align: left;
             font-weight: bold;
         }
+
+        .btn-calc {
+            background: #2563eb;
+            /* xanh hiện đại */
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.1s ease;
+        }
+
+        /* Desktop hover */
+        .btn-calc:hover {
+            background: #1d4ed8;
+        }
+
+        /* Active (mobile tap) */
+        .btn-calc:active {
+            transform: scale(0.98);
+        }
+
+        @media (max-width: 768px) {
+
+            table,
+            thead,
+            tbody,
+            th,
+            td,
+            tr {
+                display: block;
+            }
+
+            thead {
+                display: none;
+            }
+
+            tr {
+                border: 1px solid #ddd;
+                margin-bottom: 12px;
+                border-radius: 6px;
+                padding: 8px;
+                background: #fafafa;
+            }
+
+            td {
+                text-align: left;
+                border: none;
+                padding: 6px 0;
+                display: flex;
+                justify-content: space-between;
+            }
+
+            td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                color: #555;
+            }
+
+            td.label {
+                font-weight: bold;
+                font-size: 16px;
+                margin-bottom: 6px;
+                text-align: left;
+                display: block;
+                justify-content: flex-start;
+            }
+
+            td.label::before {
+                content: "";
+            }
+
+            .btn-wrapper {
+                margin: 16px 0;
+            }
+
+            .btn-calc {
+                width: 100%;
+                padding: 8px;
+                font-size: 16px;
+                border-radius: 8px;
+            }
+        }
     </style>
 </head>
 
 <body>
-
     <h2>So sánh lương sau thuế TNCN (Trước & Sau 1/1/2026)</h2>
 
     <label>Lương gross:
@@ -51,34 +136,43 @@
     </label><br><br>
 
     <label>% Tỉ lệ lương đóng BHXH:
-        <input type="number" id="bhSalary" value="60">
+        <input type="number" id="bhSalary" value="100">
     </label><br><br>
 
-    <label>% BHXH (10.5):
+    <label>% Mức đóng BHXH:
         <input type="number" id="bhRate" value="10.5">
     </label><br><br>
 
     <label>Số người phụ thuộc:
         <input type="number" id="dependents" value="0">
-    </label><br><br>
+    </label><br>
 
-    <button onclick="calculate()">Tính toán</button>
+    <div class="btn-wrapper">
+        <button class="btn-calc" onclick="calculate()">Tính toán</button>
+    </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Khoản</th>
-                <th>Trước 1/1/2026</th>
-                <th>Sau 1/1/2026</th>
-                <th>Chênh lệch</th>
-            </tr>
-        </thead>
-        <tbody id="result"></tbody>
-    </table>
-
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Khoản</th>
+                    <th>Trước 1/1/2026</th>
+                    <th>Sau 1/1/2026</th>
+                    <th>Chênh lệch</th>
+                </tr>
+            </thead>
+            <tbody id="result"></tbody>
+        </table>
+    </div>
     <p id="bonusMessage" style="margin-top:15px;font-weight:bold;color:green;"></p>
     </br>
-    <p>Tham khảo: <a href="https://vnexpress.net/quoc-hoi-chot-thue-suat-thu-nhap-ca-nhan-cao-nhat-35-4991877.html" target="_blank">Quốc hội chốt thuế suất thu nhập cá nhân cao nhất 35%</a></p>
+    <p>Tham khảo:</p>
+    <p>VnExpress: <a href="https://vnexpress.net/quoc-hoi-chot-thue-suat-thu-nhap-ca-nhan-cao-nhat-35-4991877.html"
+            target="_blank">Quốc hội chốt thuế suất thu nhập cá nhân cao nhất 35%</a></p>
+    <p>Thư viện Pháp luật: <a
+            href="https://thuvienphapluat.vn/phap-luat/ho-tro-phap-luat/ap-dung-giam-tru-gia-canh-tu-01012026-hay-0172026-muc-giam-tru-gia-canh-2026-nhu-the-nao-245956.html"
+            target="_blank">Áp dụng giảm trừ gia cảnh từ 01/01/2026 hay 01/7/2026? Mức giảm trừ gia cảnh 2026 như thế
+            nào?</a></p>
 
     <script>
         function formatCurrency(input) {
@@ -170,9 +264,9 @@
 
             const newResult = calcTax(newTaxable, newBrackets);
             const newNet = gross - bh - newResult.tax;
+            const taxRateDiff = newResult.currentBracket.rate - oldResult.currentBracket.rate;
 
             const resultDiff = newResult.tax - oldResult.tax;
-
 
             // ===== So sánh lương NET =====
             const netDiff = newNet - oldNet;
@@ -180,7 +274,7 @@
 
             if (netDiff > 0) {
                 msgEl.textContent =
-                    `🎉 Chúc mừng! Bạn đã được "tăng" lương thêm ${netDiff.toLocaleString()} đ mỗi tháng kể từ 1/1/2026`;
+                    `🎉 Chúc mừng! Bạn được "tăng" lương thêm ${netDiff.toLocaleString()} đ mỗi tháng kể từ 1/1/2026.`;
             } else if (netDiff == 0) {
                 msgEl.textContent = "ℹ️ Lương sau thuế không thay đổi khi áp dụng chính sách mới.";
                 msgEl.style.color = "#555";
@@ -188,45 +282,45 @@
 
             document.getElementById("result").innerHTML = `
     <tr><td class="label">BHXH phải đóng</td>
-        <td>${bh.toLocaleString()}</td>
-        <td>${bh.toLocaleString()}</td>
-        <td>0</td>
-    </tr>
-
-    <tr><td class="label">Giảm trừ cá nhân</td>
-        <td>${oldPersonal.toLocaleString()}</td>
-        <td>${newPersonal.toLocaleString()}</td>
-        <td ${diffColor(personalDiff)}>${personalDiff.toLocaleString()}</td>
-    </tr>
-
-    <tr><td class="label">Giảm trừ phụ thuộc</td>
-        <td>${oldDependent.toLocaleString()}</td>
-        <td>${newDependent.toLocaleString()}</td>
-        <td ${diffColor(dependentDiff)}>${dependentDiff.toLocaleString()}</td>
-    </tr>
-
-    <tr><td class="label">Thu nhập tính thuế</td>
-        <td>${oldTaxable.toLocaleString()}</td>
-        <td>${newTaxable.toLocaleString()}</td>
-        <td ${diffColor(taxableDiff)}>${taxableDiff.toLocaleString()}</td>
-    </tr>
-
-    <tr><td class="label">Thuế TNCN</td>
-        <td>${oldResult.tax.toLocaleString()}</td>
-        <td>${newResult.tax.toLocaleString()}</td>
-        <td ${diffColor(resultDiff)}>${resultDiff.toLocaleString()}</td>
-    </tr>
-
-    <tr><td class="label">Bậc thuế đang áp</td>
-        <td>Bậc ${oldResult.currentBracket.level} – ${oldResult.currentBracket.rate * 100}%</td>
-        <td>Bậc ${newResult.currentBracket.level} – ${newResult.currentBracket.rate * 100}%</td>
+        <td data-label="Trước 1/1/2026">${bh.toLocaleString()}</td>
+        <td data-label="Sau 1/1/2026">${bh.toLocaleString()}</td>
         <td></td>
     </tr>
 
+    <tr><td class="label">Giảm trừ cá nhân</td>
+        <td data-label="Trước 1/1/2026">${oldPersonal.toLocaleString()}</td>
+        <td data-label="Sau 1/1/2026">${newPersonal.toLocaleString()}</td>
+        <td data-label="Chênh lệch" ${diffColor(personalDiff)}>${personalDiff.toLocaleString()}</td>
+    </tr>
+
+    <tr><td class="label">Giảm trừ phụ thuộc</td>
+        <td data-label="Trước 1/1/2026">${oldDependent.toLocaleString()}</td>
+        <td data-label="Sau 1/1/2026">${newDependent.toLocaleString()}</td>
+        <td data-label="Chênh lệch" ${diffColor(dependentDiff)}>${dependentDiff.toLocaleString()}</td>
+    </tr>
+
+    <tr><td class="label">Thu nhập tính thuế</td>
+        <td data-label="Trước 1/1/2026">${oldTaxable.toLocaleString()}</td>
+        <td data-label="Sau 1/1/2026">${newTaxable.toLocaleString()}</td>
+        <td data-label="Chênh lệch" ${diffColor(taxableDiff)}>${taxableDiff.toLocaleString()}</td>
+    </tr>
+
+    <tr><td class="label">Thuế TNCN</td>
+        <td data-label="Trước 1/1/2026">${oldResult.tax.toLocaleString()}</td>
+        <td data-label="Sau 1/1/2026">${newResult.tax.toLocaleString()}</td>
+        <td data-label="Chênh lệch" ${diffColor(resultDiff)}>${resultDiff.toLocaleString()}</td>
+    </tr>
+
+    <tr><td class="label">Bậc thuế đang áp</td>
+        <td data-label="Trước 1/1/2026">Bậc ${oldResult.currentBracket.level} – ${oldResult.currentBracket.rate * 100}%</td>
+        <td data-label="Sau 1/1/2026">Bậc ${newResult.currentBracket.level} – ${newResult.currentBracket.rate * 100}%</td>
+        <td data-label="Chênh lệch" ${diffColor(resultDiff)}>${(taxRateDiff * 100).toLocaleString()}%</td>
+    </tr>
+
     <tr><td class="label">Lương sau thuế</td>
-        <td><b>${oldNet.toLocaleString()}</b></td>
-        <td><b>${newNet.toLocaleString()}</b></td>
-        <td ${diffColor(netDiff)}>${netDiff.toLocaleString()}</td>
+        <td data-label="Trước 1/1/2026"><b>${oldNet.toLocaleString()}</b></td>
+        <td data-label="Sau 1/1/2026"><b>${newNet.toLocaleString()}</b></td>
+        <td data-label="Chênh lệch" ${diffColor(netDiff)}>${netDiff.toLocaleString()}</td>
     </tr>
   `;
         }
